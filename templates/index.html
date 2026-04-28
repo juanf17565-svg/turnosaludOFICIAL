@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% block title %}TurnoSalud — Inicio{% endblock %}
+
+{# ── Full-width hero ────────────────────────────────────────────────── #}
+{% block hero %}
+<section class="relative w-full overflow-hidden hero-gradient">
+
+  <!-- Decorative blurred blobs -->
+  <div class="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-x-1/3 -translate-y-1/3"></div>
+  <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-indigo-900/30 rounded-full blur-3xl translate-x-1/4 translate-y-1/4"></div>
+  <div class="absolute top-1/2 left-1/2 w-72 h-72 bg-blue-300/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+
+  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20 lg:py-24">
+    <div class="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+
+      <!-- Left: text content -->
+      <div class="text-center lg:text-left">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-white/90 text-xs font-semibold mb-5 border border-white/20 backdrop-blur-sm">
+          <span class="w-1.5 h-1.5 rounded-full bg-green-400 pulse-ring"></span>
+          Sistema de turnos en línea
+        </span>
+
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.05]">
+          Reservá tu turno<br>
+          <span class="text-blue-200">en minutos</span>
+        </h1>
+
+        <p class="mt-5 text-base sm:text-lg text-white/75 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+          Encontrá el especialista que necesitás, elegí el horario que más te conviene
+          y confirmá tu turno al instante.
+        </p>
+
+        <!-- Live metrics row -->
+        <div class="mt-8 grid grid-cols-3 gap-3 max-w-md mx-auto lg:mx-0">
+          <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-3 py-3 text-center">
+            <p class="text-2xl font-extrabold text-white">{{ medicos|length }}</p>
+            <p class="text-[11px] text-white/70 mt-0.5 font-medium leading-tight">Especialistas</p>
+          </div>
+          <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-3 py-3 text-center">
+            <p class="text-2xl font-extrabold text-white">{{ medicos | sum(attribute='disponibles') }}</p>
+            <p class="text-[11px] text-white/70 mt-0.5 font-medium leading-tight">Turnos libres</p>
+          </div>
+          <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-3 py-3 text-center">
+            <p class="text-2xl font-extrabold text-white">24/7</p>
+            <p class="text-[11px] text-white/70 mt-0.5 font-medium leading-tight">Disponible</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: animated appointment widget -->
+      <div class="relative h-[380px] sm:h-[420px] hidden md:block">
+
+        <!-- Back glow -->
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-indigo-400/10 rounded-3xl blur-2xl"></div>
+
+        <!-- Floating clock badge top-right -->
+        <div class="absolute top-2 right-6 animate-float-fast">
+          <div class="bg-white rounded-2xl shadow-xl p-3 flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white animate-spin-slow" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wide leading-none">Próximo</p>
+              <p class="text-xs font-bold text-gray-900 mt-0.5 leading-none">10:30 hs</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating specialty pill top-left -->
+        <div class="absolute top-16 left-0 animate-float-mid">
+          <div class="bg-white rounded-full shadow-xl px-4 py-2 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="text-xs font-bold text-gray-800">Cardiología</span>
+          </div>
+        </div>
+
+        <!-- Central appointment card -->
+        <div class="absolute top-20 left-1/2 -translate-x-1/2 w-72 animate-float-slow">
+          <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-white/50">
+            <!-- Card header -->
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 flex items-center justify-between">
+              <span class="text-xs font-bold text-white/90 uppercase tracking-wide">Turno confirmado</span>
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-green-400 pulse-ring"></span>
+                <svg class="w-4 h-4 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+            </div>
+            <!-- Card body -->
+            <div class="p-5">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                  AR
+                </div>
+                <div class="min-w-0">
+                  <p class="font-bold text-gray-900 text-sm truncate">Dra. Ana Ramírez</p>
+                  <span class="inline-block mt-0.5 px-2 py-0.5 rounded-full bg-violet-50 text-violet-700 text-[10px] font-bold">
+                    Neurología
+                  </span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2.5 pt-3 border-t border-gray-100">
+                <div>
+                  <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">Fecha</p>
+                  <p class="text-sm font-bold text-gray-900 mt-0.5">Vie 19 Abr</p>
+                </div>
+                <div>
+                  <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">Horario</p>
+                  <p class="text-sm font-bold text-gray-900 mt-0.5">14:00 hs</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating availability chip bottom-left -->
+        <div class="absolute bottom-8 left-4 animate-float-mid">
+          <div class="bg-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wide leading-none">Reserva</p>
+              <p class="text-xs font-bold text-gray-900 mt-0.5 leading-none">Confirmada al instante</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating specialty pill bottom-right -->
+        <div class="absolute bottom-2 right-2 animate-float-fast">
+          <div class="bg-white rounded-full shadow-xl px-4 py-2 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+            <span class="text-xs font-bold text-gray-800">Pediatría</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom fade -->
+  <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-slate-50 pointer-events-none"></div>
+</section>
+{% endblock %}
+
+{# ── Main content ──────────────────────────────────────────────────── #}
+{% block content %}
+
+<!-- Specialists grid -->
+<div>
+  <div class="flex items-center justify-between mb-5">
+    <div>
+      <h2 class="text-xl font-bold text-gray-900">Especialistas disponibles</h2>
+      <p class="text-sm text-gray-400 mt-0.5">Encontrá al profesional que necesitás</p>
+    </div>
+    <span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-full border border-blue-100">
+      {{ medicos|length }} especialistas
+    </span>
+  </div>
+
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for m in medicos %}
+    {% set c = color_especialidad(m.especialidad) %}
+    <div class="bg-white border border-gray-200 rounded-2xl p-5 hover:shadow-md hover:border-gray-300 transition-all group">
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-xl {{ c[0] }} flex items-center justify-center
+                    text-white font-bold text-sm flex-shrink-0 shadow-sm">
+          {{ m.nombre[0] }}{{ m.apellido[0] }}
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="font-semibold text-gray-900 truncate">Dr/a. {{ m.nombre }} {{ m.apellido }}</p>
+          <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium {{ c[1] }} {{ c[2] }}">
+            {{ m.especialidad }}
+          </span>
+          {% if m.descripcion %}
+            <p class="text-xs text-gray-400 mt-2 line-clamp-2 leading-relaxed">{{ m.descripcion }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+        {% if m.disponibles > 0 %}
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-green-400"></span>
+            <span class="text-xs font-semibold text-green-700">{{ m.disponibles }} turnos libres</span>
+          </div>
+        {% else %}
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+            <span class="text-xs text-gray-400">Sin turnos disponibles</span>
+          </div>
+        {% endif %}
+        {% if session.get('rol') == 'paciente' %}
+          <a href="{{ url_for('paciente.turnos') }}?medico_id={{ m.medico_id }}"
+             class="text-xs font-semibold {{ c[2] }} hover:underline group-hover:translate-x-0.5 transition-transform inline-block">
+            Ver turnos →
+          </a>
+        {% elif not session.get('user_id') %}
+          <a href="{{ url_for('public.login') }}"
+             class="text-xs font-semibold text-blue-600 hover:underline">
+            Ver turnos →
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% if not session.get('user_id') %}
+<div class="mt-10 bg-gradient-to-r from-indigo-50 to-blue-50 border border-blue-100 rounded-2xl px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+  <div class="flex items-center gap-4">
+    <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
+      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04
+                 A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622
+                 0-1.042-.133-2.052-.382-3.016z"/>
+      </svg>
+    </div>
+    <div>
+      <p class="font-semibold text-gray-900 text-sm">¿Sos médico o especialista?</p>
+      <p class="text-xs text-gray-500 mt-0.5">Accedé a tu panel para gestionar tu agenda de turnos</p>
+    </div>
+  </div>
+  <a href="{{ url_for('public.login') }}"
+     class="flex-shrink-0 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
+    Acceder al panel
+  </a>
+</div>
+{% endif %}
+
+{% endblock %}
