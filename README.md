@@ -19,84 +19,126 @@ No requiere bundler ni pasos de build para el frontend.
 
 ## Requisitos previos
 
-- Python 3.8 o superior
-- MySQL Server corriendo en `localhost:3306`
-- MySQL Workbench (opcional, para inspeccionar la base)
+- **Python 3.8 o superior** — https://www.python.org/downloads/
+- **XAMPP** (recomendado), WAMP o Laragon — traen MySQL + phpMyAdmin listos para usar
+  - Descargar XAMPP: https://www.apachefriends.org/
+  - Una vez instalado, abrí el **XAMPP Control Panel** y arrancá los módulos **Apache** y **MySQL**
+- phpMyAdmin se accede desde el navegador en `http://localhost/phpmyadmin`
+
+> **No hace falta** MySQL Workbench, ni cliente de línea de comandos, ni nada más. Toda la administración de la base se hace desde phpMyAdmin en el navegador.
 
 ---
 
-## Instalación
+## Setup completo (primera vez en una máquina)
 
-### 1. Clonar / abrir el proyecto en VS Code
-
-```bash
-cd "ruta/al/proyecto"
-```
-
-### 2. Crear entorno virtual
+### 1. Clonar el repositorio
 
 ```bash
-python -m venv venv
+git clone <url-del-repo>
+cd turnosalud2-main
 ```
 
-### 3. Activar el entorno virtual
+### 2. Crear y activar el entorno virtual
 
 **Windows:**
 ```bash
+python -m venv venv
 venv\Scripts\activate
 ```
 
 **Mac / Linux:**
 ```bash
+python -m venv venv
 source venv/bin/activate
 ```
 
 El prompt debería mostrar `(venv)` al inicio.
 
-### 4. Instalar dependencias
+### 3. Instalar dependencias
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
+### 4. Arrancar MySQL desde XAMPP
 
-## Configurar MySQL
+1. Abrí el **XAMPP Control Panel**
+2. Click en **Start** al lado de **Apache**
+3. Click en **Start** al lado de **MySQL**
+4. Ambos tienen que estar en verde
 
-### Crear la base de datos (una sola vez)
+> Si MySQL no arranca por conflicto de puerto (otro MySQL como servicio de Windows ocupando el 3306), XAMPP suele asignarlo al **3308**. Anotá ese número, lo vas a necesitar más abajo.
 
-Abrí MySQL Workbench, conectate a `localhost` con tu usuario `root` y ejecutá:
+### 5. Crear la base de datos en phpMyAdmin
 
-```sql
-CREATE DATABASE turnosalud CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+1. Andá a `http://localhost/phpmyadmin` en el navegador
+2. Click en la pestaña **"Bases de datos"** (arriba)
+3. Nombre: `turnosalud`
+4. Cotejamiento: `utf8mb4_unicode_ci`
+5. Click en **Crear**
+
+### 6. Crear el archivo `.env`
+
+Copiá `.env.example` a `.env`:
+
+**Windows:**
+```bash
+copy .env.example .env
 ```
 
-### Configurar credenciales en el proyecto
-
-Abrí [app.py](app.py) y editá las líneas 12–15:
-
-```python
-DB_HOST     = 'localhost'
-DB_USER     = 'root'
-DB_PASSWORD = 'tu_password'   # ← tu contraseña de MySQL
-DB_NAME     = 'turnosalud'
+**Mac / Linux:**
+```bash
+cp .env.example .env
 ```
 
----
+Abrí `.env` y editá los valores:
 
-## Ejecutar la aplicación
+```
+FLASK_SECRET_KEY=<una-string-larga-y-random>
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=turnosalud
+FLASK_ENV=development
+```
+
+**Generar una `FLASK_SECRET_KEY` random:**
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+**Sobre `DB_PORT`:** poné el puerto que muestra MySQL en el XAMPP Control Panel. Default `3306`, pero si XAMPP lo asignó al `3308`, usá ese.
+
+> ⚠️ El `.env` está en `.gitignore` — nunca se sube al repo. Cada máquina tiene el suyo.
+
+### 7. Correr la app
 
 ```bash
 python app.py
 ```
 
-Al correr por primera vez, Flask crea automáticamente todas las tablas y carga datos de prueba.
+La **primera vez** Flask crea automáticamente todas las tablas y carga datos de prueba (médicos, paciente, turnos).
 
 Abrí el navegador en:
 
 ```
 http://127.0.0.1:5000
 ```
+
+---
+
+## Levantar la app después del setup inicial
+
+Cada vez que querés trabajar:
+
+1. Abrí XAMPP Control Panel → **Start** Apache + MySQL
+2. En la terminal:
+   ```bash
+   venv\Scripts\activate
+   python app.py
+   ```
+3. Navegador → `http://127.0.0.1:5000`
 
 ---
 
@@ -143,30 +185,38 @@ http://127.0.0.1:5000
 ## Estructura del proyecto
 
 ```
-Proyecto 1/
-├── app.py                        # Aplicación Flask (rutas, lógica, DB)
-├── requirements.txt              # Dependencias Python
-├── turnos.db                     # Solo si usás SQLite (no aplica con MySQL)
-└── templates/
-    ├── base.html                 # Layout base (navbar, flash messages, footer)
-    ├── index.html                # Landing page con listado de especialistas
-    ├── auth/
-    │   ├── login.html
-    │   └── register.html
-    ├── admin/
-    │   ├── dashboard.html        # Stats globales + actividad reciente
-    │   ├── medicos.html          # Listado y eliminación de médicos
-    │   ├── crear_medico.html     # Formulario de alta de médico
-    │   └── pacientes.html        # Listado de pacientes
-    ├── medico/
-    │   ├── dashboard.html        # Stats + próximas reservas + accesos rápidos
-    │   ├── turnos.html           # Tabla de turnos con filtros y acciones CRUD
-    │   ├── agregar_turno.html    # Modo simple / bloque con preview Alpine.js
-    │   ├── editar_turno.html     # Editar fecha u horario de un turno
-    │   └── reservas.html         # Historial de reservas de pacientes
-    └── paciente/
-        ├── turnos.html           # Buscar y reservar turnos (modal Alpine.js)
-        └── mis_turnos.html       # Mis reservas con cancelación inline
+turnosalud2-main/
+├── app.py                          # Punto de entrada del servidor de desarrollo
+├── wsgi.py                         # Punto de entrada para producción (waitress / gunicorn)
+├── requirements.txt                # Dependencias Python
+├── .env.example                    # Plantilla de variables de entorno
+├── .gitignore
+├── turnosalud/                     # Paquete principal de la app
+│   ├── __init__.py                 # App factory (create_app)
+│   ├── config.py                   # Configuración desde variables de entorno
+│   ├── constants.py                # Especialidades, colores, catálogos fijos
+│   ├── db.py                       # Helpers de conexión a MySQL (PyMySQL)
+│   ├── decorators.py               # Guards de sesión / roles
+│   ├── filters.py                  # Filtros y helpers de Jinja
+│   ├── schema.py                   # Creación de tablas + datos seed
+│   ├── services.py                 # Lógica de negocio
+│   └── blueprints/                 # Rutas separadas por rol
+│       ├── public.py               # Landing, login, register
+│       ├── paciente.py
+│       ├── medico.py
+│       └── admin.py
+├── templates/                      # Vistas Jinja
+│   ├── base.html
+│   ├── index.html
+│   ├── auth/
+│   ├── admin/
+│   ├── medico/
+│   └── paciente/
+└── tests/                          # Tests con pytest
+    ├── conftest.py
+    ├── test_auth.py
+    ├── test_medico_admin.py
+    └── test_paciente.py
 ```
 
 ---
@@ -181,6 +231,7 @@ Proyecto 1/
 | `medicos` | Especialidad, matrícula, descripción, **precio_consulta** y **notas** (reglas de convivencia) |
 | `turnos` | Fecha, horario y estado de cada turno |
 | `reservas` | Relación paciente ↔ turno con motivo y estado |
+| `avisos` | Avisos / faltas registradas a un paciente |
 
 ### Estados de un turno
 
@@ -199,7 +250,7 @@ Proyecto 1/
 
 ### Catálogo de especialidades
 
-Definido en [app.py](app.py) como `ESPECIALIDADES` (lista) y `ESPECIALIDADES_COLORES` (dict con clases Tailwind por especialidad). Incluye 33 especialidades médicas (Cardiología, Pediatría, Neurología, Dermatología, etc.), cada una con su color asignado. Para agregar una nueva: editar ambas estructuras en `app.py`.
+Definido en [turnosalud/constants.py](turnosalud/constants.py) como `ESPECIALIDADES` (lista) y `ESPECIALIDADES_COLORES` (dict con clases Tailwind por especialidad). Incluye 33 especialidades médicas, cada una con su color asignado. Para agregar una nueva: editar ambas estructuras.
 
 ---
 
@@ -216,5 +267,27 @@ python app.py
 pip install -r requirements.txt
 ```
 
-**Ver tablas en MySQL Workbench:**
-Conectate a `localhost`, abrí el schema `turnosalud` y navegá las tablas desde el panel izquierdo.
+**Correr los tests:**
+```bash
+pytest
+```
+
+**Ver tablas en phpMyAdmin:**
+Entrá a `http://localhost/phpmyadmin`, hacé click en `turnosalud` en el panel izquierdo y navegá las tablas (`usuarios`, `medicos`, `turnos`, `reservas`, `avisos`).
+
+**Resetear la base de datos** (perdés todo):
+1. En phpMyAdmin → click en `turnosalud` → pestaña **"Operaciones"** → **Eliminar la base de datos**
+2. Volvé a crearla siguiendo el paso 5 del setup
+3. `python app.py` la vuelve a llenar con datos seed
+
+---
+
+## Troubleshooting
+
+| Error | Causa | Solución |
+|---|---|---|
+| `RuntimeError: Falta FLASK_SECRET_KEY` | No existe el `.env` o no tiene la key | Crear `.env` desde `.env.example` y completar |
+| `Can't connect to MySQL server` | MySQL no arrancado o puerto incorrecto | XAMPP → Start MySQL. Verificar que `DB_PORT` del `.env` coincida con el del XAMPP Control Panel |
+| `Unknown database 'turnosalud'` | No creaste la base en phpMyAdmin | Paso 5 del setup |
+| `Access denied for user 'root'@'localhost'` | MySQL tiene contraseña | Editar `DB_PASSWORD` en el `.env` |
+| `mysqli::real_connect HY000/2002` en phpMyAdmin | MySQL no está corriendo, o phpMyAdmin apunta a un puerto distinto al de MySQL | XAMPP → Start MySQL. Si MySQL está en 3308 pero phpMyAdmin busca 3306, editar `phpMyAdmin/config.inc.php` y agregar `$cfg['Servers'][$i]['port'] = '3308';` |

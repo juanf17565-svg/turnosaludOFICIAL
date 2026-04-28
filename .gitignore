@@ -1,21 +1,52 @@
+# Variables de entorno (¡nunca subir credenciales!)
+.env
+.env.local
+.env.*.local
+
 # Entorno virtual
 venv/
 env/
-.env
-
-# Base de datos local
-*.db
-*.sqlite3
+ENV/
+.venv/
 
 # Python
 __pycache__/
 *.py[cod]
+*$py.class
 *.pyo
 *.pyd
 .Python
+*.egg-info/
+.installed.cfg
+*.egg
 
-# VS Code
+# Tests / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+
+# Type checkers
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+
+# Base de datos local (SQLite — solo si llegás a usarla)
+*.db
+*.sqlite
+*.sqlite3
+
+# IDEs / editores
 .vscode/
+.idea/
+*.swp
+*.swo
+*~
 
 # Claude Code
 .claude/
@@ -23,6 +54,12 @@ __pycache__/
 # Sistema operativo
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Logs
 *.log
+logs/
+
+# Backups
+*.bak
+*.tmp
